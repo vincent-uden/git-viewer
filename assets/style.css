@@ -18,3 +18,40 @@ h1 {
 p {
     font-family: Arial, Helvetica, sans-serif;
 }
+
+a {
+    text-decoration: none;
+    width: auto;
+}
+
+div.repo-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    gap: 16px;
+}
+
+div.repo-list a {
+    flex-grow: 1;
+}
+
+div.repo-card {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #fff3;
+    border-radius: 4px;
+
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+
+    transition: border-color 0.1s ease-in-out;
+
+    background-color: rgb(10, 10, 10);
+}
+
+div.repo-card:hover {
+    border-color: #ffff;
+}

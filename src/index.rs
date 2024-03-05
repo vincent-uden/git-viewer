@@ -35,6 +35,19 @@ fn get_repos_from_disk(root: &Path) -> anyhow::Result<Vec<RepoEntry>> {
     Ok(out)
 }
 
+fn repo_card(repo: &RepoEntry) -> Markup {
+    let backup_name = format!("/.../{}", &repo.name);
+    let path_as_str = repo.local_path.to_str().unwrap_or(&backup_name);
+    html! {
+        a href={"/repo/" (repo.name)} {
+            div class="repo-card" {
+                h3 { (repo.name) }
+                p { (path_as_str) }
+            }
+        }
+    }
+}
+
 pub async fn index(Extension(ctx): Extension<ApiContext>) -> Result<Markup, AppError> {
     let repos = get_repos_from_disk(&ctx.config.git_root)?;
 
@@ -42,8 +55,10 @@ pub async fn index(Extension(ctx): Extension<ApiContext>) -> Result<Markup, AppE
         link rel="stylesheet" href="style.css";
         main {
             h1 { "Git Registry" }
-            @for repo in &repos {
-                p { (repo.name) }
+            div class="repo-list" {
+                @for repo in &repos {
+                    (repo_card(repo))
+                }
             }
         }
     })
