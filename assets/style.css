@@ -1,3 +1,20 @@
+body {
+    background-color: #000;
+}
+
+body * {
+    color: #ffe;
+}
+
+main {
+    max-width: 768px;
+    margin: auto;
+}
+
 h1 {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+p {
     font-family: Arial, Helvetica, sans-serif;
 }

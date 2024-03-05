@@ -1,23 +1,21 @@
 use std::path::PathBuf;
 
-use axum::{
-    routing::get,
-    Router,
-};
-
+mod http;
 mod index;
 
+use http::serve;
 use index::index;
 use serde::Deserialize;
-use tower_http::services::ServeDir;
+use sqlx::sqlite::SqlitePoolOptions;
 
 #[derive(Deserialize, Debug)]
 struct Config {
     git_root: PathBuf,
+    db_url: String,
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
     let config = match envy::from_env::<Config>() {
         Ok(c) => c,
@@ -26,10 +24,12 @@ async fn main() {
         }
     };
 
-    let serve_dir = ServeDir::new("assets");
+    let db = SqlitePoolOptions::new()
+        .max_connections(50)
+        .connect(&config.db_url)
+        .await?;
 
-    let app = Router::new().route("/", get(index)).fallback_service(serve_dir);
+    sqlx::migrate!().run(&db).await?;
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    serve(config, db).await
 }
