@@ -11,7 +11,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 #[derive(Deserialize, Debug)]
 struct Config {
     git_root: PathBuf,
-    db_url: String,
+    database_url: String,
 }
 
 #[tokio::main]
@@ -26,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
 
     let db = SqlitePoolOptions::new()
         .max_connections(50)
-        .connect(&config.db_url)
+        .connect(&config.database_url)
         .await?;
 
     sqlx::migrate!().run(&db).await?;

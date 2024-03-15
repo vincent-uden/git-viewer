@@ -48,8 +48,19 @@ fn repo_card(repo: &RepoEntry) -> Markup {
     }
 }
 
+fn footer() -> Markup {
+    html! {
+        footer {
+            div class="spacer";
+        }
+    }
+}
+
 pub async fn index(Extension(ctx): Extension<ApiContext>) -> Result<Markup, AppError> {
     let repos = get_repos_from_disk(&ctx.config.git_root)?;
+    let total_visits = sqlx::query!(r#"select count(*) as count from visits;"#).fetch_one(&ctx.db).await?;
+
+    println!("{:?}", total_visits.count);
 
     Ok(html! {
         link rel="stylesheet" href="style.css";
@@ -60,6 +71,7 @@ pub async fn index(Extension(ctx): Extension<ApiContext>) -> Result<Markup, AppE
                     (repo_card(repo))
                 }
             }
+            (footer())
         }
     })
 }
