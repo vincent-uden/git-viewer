@@ -1,4 +1,4 @@
 CREATE TABLE visits (
-    path TEXT,
-    created_at INTEGER
+    path TEXT NOT NULL,
+    created_at INTEGER NOT NULL
 );

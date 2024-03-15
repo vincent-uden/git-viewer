@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "insert into visits (path, created_at) values ($1, $2);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "56e49c6c0b35749ac535a97f02a264e9f9fa86e3c2cfe284a3b973903c7c39e3"
+}

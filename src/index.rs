@@ -6,7 +6,8 @@ use std::{
 
 use anyhow::Error;
 use axum::Extension;
-use maud::{html, Markup};
+use chrono::{DateTime, Local};
+use maud::{html, Markup, DOCTYPE};
 
 use crate::http::{ApiContext, AppError};
 
@@ -48,30 +49,52 @@ fn repo_card(repo: &RepoEntry) -> Markup {
     }
 }
 
-fn footer() -> Markup {
+pub fn footer(visits: i32, last_visit: DateTime<Local>) -> Markup {
     html! {
         footer {
             div class="spacer";
+            div class="split" {
+                aside {
+                    p {
+                        "Last visited: " span class="faded" {
+                            (last_visit.format("%d/%m/%Y %H:%M"))
+                        }
+                    }
+                    p { "Total visits: " span class="faded" { (visits) }}
+                }
+                aside {
+                    a href="https://github.com/vincent-uden/git-viewer" {
+                        img src="github-mark-white.svg";
+                    }
+                }
+            }
         }
     }
 }
 
 pub async fn index(Extension(ctx): Extension<ApiContext>) -> Result<Markup, AppError> {
     let repos = get_repos_from_disk(&ctx.config.git_root)?;
-    let total_visits = sqlx::query!(r#"select count(*) as count from visits;"#).fetch_one(&ctx.db).await?;
-
-    println!("{:?}", total_visits.count);
+    let total_visits = sqlx::query!(r#"select count(*) as count from visits;"#)
+        .fetch_one(&ctx.db)
+        .await?;
+    let last_visit =
+        sqlx::query!(r#"select created_at from visits order by created_at desc limit 1"#)
+            .fetch_one(&ctx.db)
+            .await?;
+    let timestamp: DateTime<Local> = DateTime::from(
+        DateTime::from_timestamp_millis(last_visit.created_at).unwrap_or(DateTime::default()),
+    );
 
     Ok(html! {
+        (DOCTYPE)
         link rel="stylesheet" href="style.css";
         main {
-            h1 { "Git Registry" }
+            a href="/" { h1 { "Git Registry" } }
             div class="repo-list" {
                 @for repo in &repos {
                     (repo_card(repo))
                 }
             }
-            (footer())
         }
     })
 }

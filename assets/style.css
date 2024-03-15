@@ -13,16 +13,25 @@ main {
 
 h1 {
     padding-top: 16px;
-    font-family: Arial, Helvetica, sans-serif;
 }
 
-p {
+h2 {
+    padding-top: 12px;
+}
+
+h1,h2,h3,h4,h5,h6,p,a {
     font-family: Arial, Helvetica, sans-serif;
 }
 
 a {
     text-decoration: none;
     width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 div.repo-list {
@@ -55,4 +64,90 @@ div.repo-card {
 
 div.repo-card:hover {
     border-color: #ffff;
+}
+
+footer {
+    margin-top: 64px;
+    margin-bottom: 64px;
+
+    div.spacer {
+        margin-top: 16px;
+        border-top: 1px solid #fff3;
+    }
+
+    div.split {
+        display: flex;
+        flex-direction: row;
+
+        padding-top: 24px;
+    }
+
+    aside:nth-child(1) {
+        flex-grow: 1;
+    }
+
+    aside:not(:first-child) {
+        flex-grow: 0;
+    }
+
+    span.faded {
+        color: #fff6;
+        font-weight: bold;
+    }
+
+    p {
+        margin: 0;
+        margin-bottom: 12px;
+    }
+
+    a {
+        font-weight: 800;
+
+        img {
+            width: 48px;
+            aspect-ratio: 1 / 1;
+
+            opacity: 0.2;
+
+            transition: opacity .15s cubic-bezier(0.11, 0, 0.5, 0);
+        }
+
+        img:hover {
+            opacity: 1.0;
+        }
+    }
+}
+
+div.md-root {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #fff3;
+    border-radius: 4px;
+
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-top: 4px;
+    padding-bottom: 24px;
+
+
+    background-color: rgb(10, 10, 10);
+
+    a {
+        color: rgb(160, 160, 160);
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    pre {
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+
+        background-color: rgb(0, 0, 0);
+
+        border-radius: 4px;
+    }
 }

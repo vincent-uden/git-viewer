@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 mod http;
 mod index;
+mod repo;
 
 use http::serve;
 use index::index;
@@ -12,6 +13,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 struct Config {
     git_root: PathBuf,
     database_url: String,
+    clone_root: String,
 }
 
 #[tokio::main]

@@ -1,7 +1,13 @@
-use std::{slice::SliceIndex, sync::Arc};
+use std::{
+    slice::SliceIndex,
+    sync::Arc,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 
 use axum::{
+    extract::Request,
     http::StatusCode,
+    middleware::{self, Next},
     response::{IntoResponse, Response},
     routing::get,
     Extension, Router,
@@ -10,7 +16,7 @@ use sqlx::{Pool, Sqlite};
 use tower::ServiceBuilder;
 use tower_http::{services::ServeDir, trace::TraceLayer};
 
-use crate::{index, Config};
+use crate::{index, repo::repo, Config};
 
 #[derive(Clone)]
 pub struct ApiContext {
@@ -38,6 +44,28 @@ where
     }
 }
 
+async fn telemetry(
+    Extension(ctx): Extension<ApiContext>,
+    req: Request,
+    next: Next,
+) -> Result<Response, AppError> {
+    println!("{:?}", req.uri());
+    let path = req.uri().to_string();
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or(Duration::from_secs(0))
+        .as_millis() as i64;
+    sqlx::query!(
+        r#"insert into visits (path, created_at) values ($1, $2);"#,
+        path,
+        timestamp
+    )
+    .execute(&ctx.db)
+    .await?;
+
+    Ok(next.run(req).await)
+}
+
 pub async fn serve(config: Config, db: Pool<Sqlite>) -> anyhow::Result<()> {
     let app = api_router().layer(
         ServiceBuilder::new()
@@ -45,7 +73,8 @@ pub async fn serve(config: Config, db: Pool<Sqlite>) -> anyhow::Result<()> {
                 config: Arc::new(config),
                 db,
             }))
-            .layer(TraceLayer::new_for_http()),
+            .layer(TraceLayer::new_for_http())
+            .layer(middleware::from_fn(telemetry)),
     );
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -58,5 +87,6 @@ fn api_router() -> Router {
     let serve_dir = ServeDir::new("assets");
     Router::new()
         .route("/", get(index))
+        .route("/repo/:name", get(repo))
         .fallback_service(serve_dir)
 }

@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "select created_at from visits order by created_at desc limit 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "created_at",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e513280b724ae086a6ca7de76819dc25423cca6a24d1f11a0dc2dd0b2278bcba"
+}
